@@ -1,7 +1,7 @@
 {
   "uid": "tibber-household",
   "title": "Tibber",
-  "description": "Tibber power, price and cost for one home. Phone first; every 'now' value goes blank when the meter feed stops. Exporter alerts (needs kube-prometheus alert rules) can be turned on under Settings > Annotations.",
+  "description": "Tibber power, price and cost for one home. Phone first; the meter values (Power now, Today so far, Phase current now) go blank when the meter feed stops. Exporter alerts (needs kube-prometheus alert rules) can be turned on under Settings > Annotations.",
   "tags": [
     "home",
     "energy"
@@ -85,7 +85,7 @@
             16
           ]
         },
-        "expr": "max by (alertname) (ALERTS{alertstate=\"firing\",container=\"tibber-exporter\"} or ALERTS{alertstate=\"firing\",pod=~\"tibber-exporter.*\"})",
+        "expr": "max by (alertname) (ALERTS{alertstate=\"firing\",container=\"tibber-exporter\"} or ALERTS{alertstate=\"firing\",pod=~\"tibber-exporter.*\"} or ALERTS{alertstate=\"firing\",job=\"tibber-exporter\"} or ALERTS{alertstate=\"firing\",deployment=\"tibber-exporter\"})",
         "step": "1m",
         "titleFormat": "{{alertname}}",
         "useValueForTime": false
@@ -137,7 +137,7 @@
       "id": 1,
       "type": "stat",
       "title": "",
-      "description": "Is the meter data live? Live: the newest reading is under 2 min old (normal is 10 to 40 s). Delayed: 2 to 5 min. Stopped: older than 5 min; every 'now' value on this page is then blank instead of showing an old number. With an absolute time range (for example after zooming) this shows the state at the end of the range.",
+      "description": "Is the meter data live? Live: the newest reading is under 2 min old (normal is 10 to 40 s). Delayed: 2 to 5 min. Stopped: older than 5 min. From 2 min the meter values on this page (Power now, Today so far, Phase current now) are blank instead of showing an old number. With an absolute time range (for example after zooming) this shows the state at the end of the range.",
       "gridPos": {
         "x": 0,
         "y": 0,
@@ -1676,7 +1676,7 @@
       "id": 10,
       "type": "timeseries",
       "title": "Energy per day",
-      "description": "Per local day (in the dashboard's time zone), last 30 days, from the exporter's since-midnight totals. The pale bar is today, still growing. With an absolute time range this panel follows that range instead of the last 30 days.",
+      "description": "Per local day (in the dashboard's time zone), last 30 days, from the exporter's since-midnight totals. The pale bar is today, still growing; it appears 1 hour after local midnight. With an absolute time range this panel follows that range instead of the last 30 days.",
       "gridPos": {
         "x": 0,
         "y": 30,
@@ -1694,7 +1694,7 @@
             "uid": "${datasource}"
           },
           "refId": "A",
-          "expr": "max by (home_id) (max_over_time((tibber_power_consumption_day_total{home_id=\"$home\"} and on() (vector(time()) <= ${__to:date:seconds}))[1d:1m] offset -1d)) and on() (vector(time()) <= ${__to:date:seconds} - 86400)",
+          "expr": "max by (home_id) (max_over_time((tibber_power_consumption_day_total{home_id=\"$home\"} and on() (vector(time()) <= ${__to:date:seconds}))[1d:1m] offset -25h)) and on() (vector(time()) <= ${__to:date:seconds} - 86400)",
           "editorMode": "code",
           "range": true,
           "instant": false,
@@ -1707,7 +1707,7 @@
             "uid": "${datasource}"
           },
           "refId": "B",
-          "expr": "max by (home_id) (max_over_time((tibber_power_consumption_day_total{home_id=\"$home\"} and on() (vector(time()) <= ${__to:date:seconds}))[1d:1m] offset -1d)) and on() (vector(time()) > ${__to:date:seconds} - 86400)",
+          "expr": "max by (home_id) (max_over_time((tibber_power_consumption_day_total{home_id=\"$home\"} and on() (vector(time()) <= ${__to:date:seconds}))[1d:1m] offset -25h)) and on() (vector(time()) > ${__to:date:seconds} - 86400)",
           "editorMode": "code",
           "range": true,
           "instant": false,
@@ -1804,7 +1804,7 @@
       "id": 11,
       "type": "timeseries",
       "title": "Cost per day",
-      "description": "Per local day (in the dashboard's time zone), last 30 days, from the exporter's since-midnight totals. The pale bar is today, still growing. With an absolute time range this panel follows that range instead of the last 30 days.",
+      "description": "Per local day (in the dashboard's time zone), last 30 days, from the exporter's since-midnight totals. The pale bar is today, still growing; it appears 1 hour after local midnight. With an absolute time range this panel follows that range instead of the last 30 days.",
       "gridPos": {
         "x": 12,
         "y": 30,
@@ -1822,7 +1822,7 @@
             "uid": "${datasource}"
           },
           "refId": "A",
-          "expr": "max by (home_id) (max_over_time((tibber_power_cost_day{home_id=\"$home\"} and on() (vector(time()) <= ${__to:date:seconds}))[1d:1m] offset -1d)) and on() (vector(time()) <= ${__to:date:seconds} - 86400)",
+          "expr": "max by (home_id) (max_over_time((tibber_power_cost_day{home_id=\"$home\"} and on() (vector(time()) <= ${__to:date:seconds}))[1d:1m] offset -25h)) and on() (vector(time()) <= ${__to:date:seconds} - 86400)",
           "editorMode": "code",
           "range": true,
           "instant": false,
@@ -1835,7 +1835,7 @@
             "uid": "${datasource}"
           },
           "refId": "B",
-          "expr": "max by (home_id) (max_over_time((tibber_power_cost_day{home_id=\"$home\"} and on() (vector(time()) <= ${__to:date:seconds}))[1d:1m] offset -1d)) and on() (vector(time()) > ${__to:date:seconds} - 86400)",
+          "expr": "max by (home_id) (max_over_time((tibber_power_cost_day{home_id=\"$home\"} and on() (vector(time()) <= ${__to:date:seconds}))[1d:1m] offset -25h)) and on() (vector(time()) > ${__to:date:seconds} - 86400)",
           "editorMode": "code",
           "range": true,
           "instant": false,
