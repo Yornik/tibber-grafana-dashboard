@@ -10,8 +10,8 @@ power cheap over the selected range.
 ## Panels
 
 - **Meter feed**: Live, Delayed or Stopped, with the time since the last
-  reading. When the feed stops, every "now" value goes blank instead of
-  showing an old number.
+  reading. When the feed stops, the meter values (power now, today so far
+  and the phase currents) go blank instead of showing an old number.
 - **Power now**, **Price now** (with Tibber's level now and in 1 hour) and
   **Today so far** (kWh, cost, and the average price paid per kWh).
 - **Next hour, per quarter**: the 15-minute slots that start in the next hour,
@@ -24,7 +24,8 @@ power cheap over the selected range.
 - **Price per 15-minute slot**: one bar per slot, coloured by its level.
   **Power** sits directly below it on the same time axis.
 - **Energy per day** and **Cost per day** for the last 30 days. Today's bar is
-  pale while the day is still running.
+  pale while the day is still running, and appears 1 hour after local
+  midnight.
 - **Meter and feed details** (collapsed): current per phase, feed history,
   minutes without readings, voltage per phase and meter signal strength.
 - Grey regions on the time charts mark gaps in the meter feed.
@@ -63,6 +64,11 @@ Tested with Grafana 13.2.4.
   and "Today so far" follow the exporter's local midnight, so set the
   dashboard time zone to the home's time zone if your browser is elsewhere.
   The per-day bars assume a time zone less than 24 hours east of UTC.
+- **Per-day bars and summer time**: Grafana aligns the daily steps to the
+  viewer's current UTC offset, so for days on the other side of a summer-time
+  change a step sits 1 hour before or after local midnight. Each bar reads the
+  day's total from a window that starts 1 hour after its step, which gives the
+  right total at either alignment, also on the 23- and 25-hour days.
 - **Main fuse**: the per-phase current bars run to 25 A, with orange from
   20 A and red at 25 A. Change the maximum and thresholds to match your fuse.
 - **Next hour**: Prometheus only holds prices 60 minutes ahead, so the
